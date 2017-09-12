@@ -1,15 +1,15 @@
 FROM {{BASE_IMAGE}}
 
-ARG cpu_arch
+ARG docker_arch
 ENV DOCKER_CHANNEL=stable \
     DOCKER_VERSION=17.06.2-ce \
-    CPU_ARCH=${cpu_arch}
+    DOCKER_ARCH=${docker_arch}
 
 # TODO ENV DOCKER_SHA256
 # https://github.com/docker/docker-ce/blob/5b073ee2cf564edee5adca05eee574142f7627bb/components/packaging/static/hash_files !!
 RUN apk add --no-cache ca-certificates && \
     apk add --no-cache --virtual .fetch-deps curl tar && \
-  curl -fsL -o docker.tgz "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/${CPU_ARCH}/docker-${DOCKER_VERSION}.tgz" && \
+  curl -fsL -o docker.tgz "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/${DOCKER_ARCH}/docker-${DOCKER_VERSION}.tgz" && \
     tar --extract --file docker.tgz --strip-components 1 --directory /usr/local/bin/ && \
     rm docker.tgz && \
     ls -hsal /usr/local/bin && \
