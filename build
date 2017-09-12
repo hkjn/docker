@@ -11,8 +11,7 @@ declare TAG="${DOCKER_USER}/${DOCKER_IMAGE}:${CPU_ARCH}"
 declare NO_PUSH=${NO_PUSH:-""}
 
 cd ${BASE_DIR}
-export BASE_IMAGE=${BASE_IMAGE}
-envsubst '${BASE_IMAGE}' < Dockerfile.in > ${BUILD_DIR}/Dockerfile
+sed "s|{{BASE_IMAGE}}|${BASE_IMAGE}|g" Dockerfile.in > $BUILD_DIR/Dockerfile
 cp docker-entrypoint.sh ${BUILD_DIR}
 
 echo "Building ${TAG} in ${BUILD_DIR}.."
