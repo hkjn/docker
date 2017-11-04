@@ -17,9 +17,8 @@ build: pre-build docker-build post-build
 pre-build:
 
 post-build:
-	# TODO: Reenable
-	#@echo "Squashing image.."
-	#@ . $(RELEASE_SUPPORT); dockerSquash $(IMAGE):$(VERSION)-$(DOCKER_ARCH)
+	@echo "Squashing image.."
+	@ . $(RELEASE_SUPPORT); dockerSquash $(IMAGE):$(VERSION)-$(DOCKER_ARCH)
 
 post-push:
 
