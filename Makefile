@@ -21,6 +21,18 @@ post-build:
 	@ . $(RELEASE_SUPPORT); dockerSquash $(IMAGE):$(VERSION)-$(DOCKER_ARCH)
 
 post-push:
+	@echo "Pushing multi-arch manifest to $(IMAGE):$(VERSION).."
+	docker run --rm -v $(HOME)/.docker:/root/.docker:ro \
+	       hkjn/manifest-tool \
+	       push from-args --platforms linux/amd64,linux/arm \
+		              --template $(IMAGE):$(VERSION)-ARCH \
+			      --target $(IMAGE):$(VERSION)
+	@echo "Pushing multi-arch manifest to $(IMAGE).."
+	docker run --rm -v $(HOME)/.docker:/root/.docker:ro \
+	       hkjn/manifest-tool \
+	       push from-args --platforms linux/amd64,linux/arm \
+		              --template $(IMAGE):$(VERSION)-ARCH \
+			      --target $(IMAGE)
 
 docker-build: .release
 	@echo "Building image.."
