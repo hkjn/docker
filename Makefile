@@ -1,11 +1,10 @@
 USERNAME=hkjn
 NAME=$(shell basename $(PWD))
 
-RELEASE_SUPPORT := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/.make-release-support
 IMAGE=$(USERNAME)/$(NAME)
-DOCKER_ARCH=$(shell . $(RELEASE_SUPPORT) ; getDockerArch)
-DOCKER_DOWNLOAD_ARCH=$(shell . $(RELEASE_SUPPORT) ; getDockerDownloadArch)
-VERSION=$(shell . $(RELEASE_SUPPORT) ; getVersion)
+DOCKER_ARCH=$(shell bash get_docker_arch)
+DOCKER_DOWNLOAD_ARCH=$(shell bash get_docker_download_arch)
+VERSION=$(shell cat VERSION)
 
 SHELL=/bin/bash
 
@@ -17,7 +16,11 @@ pre-build:
 
 post-build:
 	@echo "Squashing image.."
-	@ . $(RELEASE_SUPPORT); dockerSquash $(IMAGE):$(VERSION)-$(DOCKER_ARCH)
+	docker run --rm \
+		   -v /var/run/docker.sock:/var/run/docker.sock \
+		   hkjn/docker-squash \
+		     -t $(IMAGE):$(VERSION)-$(DOCKER_ARCH) \
+		        $(IMAGE):$(VERSION)-$(DOCKER_ARCH)
 
 post-push:
 	@echo "Pushing multi-arch manifest to $(IMAGE):$(VERSION).."
@@ -39,7 +42,8 @@ docker-build:
 	             --build-arg docker_arch=$(DOCKER_DOWNLOAD_ARCH) \
 		     --build-arg docker_version=$(VERSION) .
 	@echo "Tagging image.."
-	docker tag $(IMAGE):$(VERSION)-$(DOCKER_ARCH) $(IMAGE):$(VERSION)-$(DOCKER_ARCH)
+	docker tag $(IMAGE):$(VERSION)-$(DOCKER_ARCH) \
+		   $(IMAGE):$(VERSION)-$(DOCKER_ARCH)
 
 push: do-push post-push
 
